@@ -1,7 +1,6 @@
 package za.ac.cput.logisticmanagementsystem.factory;
 
 import za.ac.cput.logisticmanagementsystem.domain.Shipment;
-import za.ac.cput.logisticmanagementsystem.util.Helper;
 
 import java.time.LocalDate;
 import java.util.UUID;
@@ -57,7 +56,7 @@ public class ShipmentFactory {
     }
 
     private static String generateShipmentId() {
-        return "SHIP-" + UUID.randomUUID().toString();
+        return "SHIP-" + UUID.randomUUID();
     }
 
 }
