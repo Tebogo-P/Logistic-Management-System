@@ -1,7 +1,8 @@
 package za.ac.cput.logisticmanagementsystem.repository;
 
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 import za.ac.cput.logisticmanagementsystem.domain.Invoice;
-import java.util.Set;
 
 /**
  * IInvoiceRepository.java
@@ -10,6 +11,6 @@ import java.util.Set;
  * Date: 27 July 2026
  */
 
-public interface IInvoiceRepository extends IRepository<Invoice, String> {
-    Set<Invoice> getAll();
+@Repository
+public interface IInvoiceRepository extends JpaRepository<Invoice, String> {
 }

@@ -13,16 +13,16 @@ import java.util.List;
 
 public class InventoryRepository implements IInventoryRepository {
 
-    private static InventoryRepository instance;
+    private static InventoryRepository repo;
     private final List<Inventory> inventoryList = new ArrayList<>();
 
     private InventoryRepository() {}
 
     public static synchronized InventoryRepository getInstance() {
-        if (instance == null) {
-            instance = new InventoryRepository();
+        if (repo == null) {
+            repo = new InventoryRepository();
         }
-        return instance;
+        return repo;
     }
 
     @Override
