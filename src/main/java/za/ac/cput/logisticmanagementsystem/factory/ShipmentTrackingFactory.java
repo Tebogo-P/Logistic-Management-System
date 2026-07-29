@@ -1,9 +1,7 @@
 package za.ac.cput.logisticmanagementsystem.factory;
 
-
-
-import za.ac.cput.domain.Shipment;
-import za.ac.cput.domain.ShipmentTracking;
+import za.ac.cput.logisticmanagementsystem.domain.Shipment;
+import za.ac.cput.logisticmanagementsystem.domain.ShipmentTracking;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
