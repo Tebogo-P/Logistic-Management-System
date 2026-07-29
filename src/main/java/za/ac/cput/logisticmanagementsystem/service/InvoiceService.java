@@ -1,9 +1,9 @@
 package za.ac.cput.logisticmanagementsystem.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import za.ac.cput.logisticmanagementsystem.domain.Invoice;
 import za.ac.cput.logisticmanagementsystem.repository.IInvoiceRepository;
-import za.ac.cput.logisticmanagementsystem.repository.InvoiceRepository;
 
 import java.util.List;
 
@@ -19,8 +19,9 @@ public class InvoiceService implements IInvoiceService {
 
     private final IInvoiceRepository repository;
 
-    public InvoiceService() {
-        this.repository = InvoiceRepository.getRepository();
+    @Autowired
+    public InvoiceService(IInvoiceRepository repository) {
+        this.repository = repository;
     }
 
     @Override
@@ -28,12 +29,12 @@ public class InvoiceService implements IInvoiceService {
         if (invoice == null) {
             return null;
         }
-        return repository.create(invoice);
+        return repository.save(invoice);
     }
 
     @Override
     public Invoice read(String invoiceId) {
-        return repository.read(invoiceId);
+        return repository.findById(invoiceId).orElse(null);
     }
 
     @Override
@@ -41,17 +42,21 @@ public class InvoiceService implements IInvoiceService {
         if (invoice == null) {
             return null;
         }
-        return repository.update(invoice);
+        return repository.save(invoice);
     }
 
     @Override
     public boolean delete(String invoiceId) {
-        return repository.delete(invoiceId);
+        if (repository.existsById(invoiceId)) {
+            repository.deleteById(invoiceId);
+            return true;
+        }
+        return false;
     }
 
     @Override
     public List<Invoice> getAll() {
-        return (List<Invoice>) repository.getAll();
+        return repository.findAll();
     }
 
     @Override
@@ -64,7 +69,7 @@ public class InvoiceService implements IInvoiceService {
                     .paymentStatus(paymentStatus)
                     .dateIssued(invoice.getDateIssued())
                     .build();
-            return repository.update(updated);
+            return repository.save(updated);
         }
         return null;
     }
