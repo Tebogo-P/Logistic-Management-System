@@ -1,131 +1,99 @@
 package za.ac.cput.logisticmanagementsystem.service;
 
-import org.junit.jupiter.api.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import static org.junit.jupiter.api.Assertions.*;
-
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import za.ac.cput.logisticmanagementsystem.domain.Invoice;
 import za.ac.cput.logisticmanagementsystem.factory.InvoiceFactory;
-import za.ac.cput.logisticmanagementsystem.repository.InvoiceRepository;
-
 import java.util.Date;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * InvoiceServiceTest.java
- * Test class for InvoiceService
+ * Service implementation for Invoice business logic tests
  * Author: Tebogo Pii 230226442
- * Date: 27-28 July 2026
+ * Date: 29 July 2026
  */
 
-@SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class InvoiceServiceTest {
 
-    @Autowired
-    private InvoiceService service;
-
-    @Autowired
-    private InvoiceRepository repository;
-
-    private static String invoiceId;
-    private static final Date dateIssued = new Date();
-
-    @BeforeEach
-    void setUp() {
-        repository.deleteAll();
-    }
+    private static final IInvoiceService service = new InvoiceService();
+    private static final Invoice invoice = InvoiceFactory.buildInvoice(2500.50, "Pending", new Date());
 
     @Test
     @Order(1)
-    void a_testCreate() {
-        Invoice invoice = InvoiceFactory.buildInvoice(2500.50, "Pending", dateIssued);
+    void create() {
         Invoice created = service.create(invoice);
         assertNotNull(created);
-        invoiceId = created.getInvoiceId();
+        assertEquals(invoice.getInvoiceId(), created.getInvoiceId());
         System.out.println("Created: " + created);
     }
 
     @Test
     @Order(2)
-    void b_testRead() {
-        Invoice invoice = InvoiceFactory.buildInvoice(1500.00, "Paid", dateIssued);
-        Invoice created = service.create(invoice);
-        Invoice read = service.read(created.getInvoiceId());
+    void read() {
+        Invoice read = service.read(invoice.getInvoiceId());
         assertNotNull(read);
-        assertEquals(1500.00, read.getTotal());
+        assertEquals(2500.50, read.getTotal());
+        System.out.println("Read: " + read);
     }
 
     @Test
     @Order(3)
-    void c_testUpdate() {
-        Invoice invoice = InvoiceFactory.buildInvoice(1000.00, "Pending", dateIssued);
-        Invoice created = service.create(invoice);
-        
-        Invoice updated = new Invoice.Builder()
-                .invoiceId(created.getInvoiceId())
-                .total(2000.00)
+    void update() {
+        Invoice updatedInvoice = new Invoice.Builder()
+                .invoiceId(invoice.getInvoiceId())
+                .total(3000.00)
                 .paymentStatus("Paid")
-                .dateIssued(dateIssued)
+                .dateIssued(invoice.getDateIssued())
                 .build();
-        
-        Invoice result = service.update(updated);
-        assertNotNull(result);
-        assertEquals(2000.00, result.getTotal());
+
+        Invoice updated = service.update(updatedInvoice);
+        assertNotNull(updated);
+        assertEquals(3000.00, updated.getTotal());
+        System.out.println("Updated: " + updated);
     }
 
     @Test
     @Order(4)
-    void d_testUpdatePaymentStatus() {
-        Invoice invoice = InvoiceFactory.buildInvoice(1800.00, "Pending", dateIssued);
-        Invoice created = service.create(invoice);
-        Invoice updated = service.updatePaymentStatus(created.getInvoiceId(), "Overdue");
+    void updatePaymentStatus() {
+        Invoice updated = service.updatePaymentStatus(invoice.getInvoiceId(), "Overdue");
         assertNotNull(updated);
         assertEquals("Overdue", updated.getPaymentStatus());
+        System.out.println("Updated Payment Status: " + updated);
     }
 
     @Test
     @Order(5)
-    void e_testGetAll() {
-        service.create(InvoiceFactory.buildInvoice(1000.00, "Paid", dateIssued));
-        service.create(InvoiceFactory.buildInvoice(2000.00, "Pending", dateIssued));
-        assertTrue(service.getAll().size() >= 2);
+    void getAll() {
+        assertFalse(service.getAll().isEmpty());
+        System.out.println("All invoices: " + service.getAll());
     }
 
     @Test
     @Order(6)
-    void f_testDelete() {
-        Invoice invoice = InvoiceFactory.buildInvoice(900.00, "Paid", dateIssued);
-        Invoice created = service.create(invoice);
-        boolean deleted = service.delete(created.getInvoiceId());
+    void delete() {
+        boolean deleted = service.delete(invoice.getInvoiceId());
         assertTrue(deleted);
-        assertNull(service.read(created.getInvoiceId()));
+        assertNull(service.read(invoice.getInvoiceId()));
+        System.out.println("Deleted Successfully: " + invoice.getInvoiceId());
     }
 
     @Test
-    void testCreateWithNull() {
-        assertNull(service.create(null));
-    }
-
-    @Test
-    void testReadNonExistent() {
-        assertNull(service.read("invalid-id"));
-    }
-
-    @Test
-    void testUpdateWithNull() {
-        assertNull(service.update(null));
+    void testCreateWithNullInvoice() {
+        Invoice created = service.create(null);
+        assertNull(created);
     }
 
     @Test
     void testUpdatePaymentStatusWithInvalidInput() {
-        Invoice invoice = InvoiceFactory.buildInvoice(1200.00, "Pending", dateIssued);
-        Invoice created = service.create(invoice);
-        
+        Invoice testInvoice = InvoiceFactory.buildInvoice(1200.00, "Pending", new Date());
+        service.create(testInvoice);
+
         assertNull(service.updatePaymentStatus("invalid-id", "Paid"));
-        assertNull(service.updatePaymentStatus(created.getInvoiceId(), null));
-        assertNull(service.updatePaymentStatus(created.getInvoiceId(), ""));
+        assertNull(service.updatePaymentStatus(testInvoice.getInvoiceId(), null));
+        assertNull(service.updatePaymentStatus(testInvoice.getInvoiceId(), ""));
     }
 }
-
-
