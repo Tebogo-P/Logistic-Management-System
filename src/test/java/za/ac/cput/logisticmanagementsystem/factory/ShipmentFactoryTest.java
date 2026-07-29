@@ -19,7 +19,8 @@ public class ShipmentFactoryTest {
         Shipment shipment = ShipmentFactory.createShipment(
                 450.0,
                 "Cape Town", "Johannesburg",
-                LocalDate.now(), LocalDate.now().plusDays(3)
+                LocalDate.now(),
+                LocalDate.now().plusDays(3)
         );
 
         assertNotNull(shipment);

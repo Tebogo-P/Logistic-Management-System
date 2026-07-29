@@ -1,4 +1,4 @@
 package za.ac.cput.logisticmanagementsystem.repository;
 
-public class PackageRepositoryTests {
+public interface ICompanyReepository {
 }

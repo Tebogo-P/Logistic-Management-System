@@ -1,10 +1,9 @@
 package za.ac.cput.logisticmanagementsystem.factory;
 
+import za.ac.cput.logisticmanagementsystem.domain.Shipment;
+import za.ac.cput.logisticmanagementsystem.domain.ShipmentTracking;
 
-
-import za.ac.cput.domain.Shipment;
-import za.ac.cput.domain.ShipmentTracking;
-
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -20,7 +19,7 @@ public class ShipmentTrackingFactory {
                 .setTrackingNumber("TRK-" + System.currentTimeMillis())
                 .setCurrentLocation(currentLocation)
                 .setShipmentStatus(shipmentStatus)
-                .setDateCreated(LocalDateTime.now())
+                .setDateCreated(LocalDate.from(LocalDateTime.now()))
                 .setShipment(shipment)
                 .build();
     }
