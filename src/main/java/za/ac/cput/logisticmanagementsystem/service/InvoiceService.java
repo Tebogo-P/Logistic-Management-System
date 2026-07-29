@@ -2,10 +2,10 @@ package za.ac.cput.logisticmanagementsystem.service;
 
 import org.springframework.stereotype.Service;
 import za.ac.cput.logisticmanagementsystem.domain.Invoice;
+import za.ac.cput.logisticmanagementsystem.repository.IInvoiceRepository;
 import za.ac.cput.logisticmanagementsystem.repository.InvoiceRepository;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * InvoiceService.java
@@ -17,10 +17,10 @@ import java.util.Optional;
 @Service
 public class InvoiceService implements IInvoiceService {
 
-    private final InvoiceRepository repository;
+    private final IInvoiceRepository repository;
 
-    public InvoiceService(InvoiceRepository repository) {
-        this.repository = repository;
+    public InvoiceService() {
+        this.repository = InvoiceRepository.getRepository();
     }
 
     @Override
@@ -28,13 +28,12 @@ public class InvoiceService implements IInvoiceService {
         if (invoice == null) {
             return null;
         }
-        return repository.save(invoice);
+        return repository.create(invoice);
     }
 
     @Override
     public Invoice read(String invoiceId) {
-        Optional<Invoice> invoice = repository.findById(invoiceId);
-        return invoice.orElse(null);
+        return repository.read(invoiceId);
     }
 
     @Override
@@ -42,22 +41,17 @@ public class InvoiceService implements IInvoiceService {
         if (invoice == null) {
             return null;
         }
-        return repository.save(invoice);
+        return repository.update(invoice);
     }
 
     @Override
     public boolean delete(String invoiceId) {
-        try {
-            repository.deleteById(invoiceId);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
+        return repository.delete(invoiceId);
     }
 
     @Override
     public List<Invoice> getAll() {
-        return repository.findAll();
+        return (List<Invoice>) repository.getAll();
     }
 
     @Override
@@ -70,7 +64,7 @@ public class InvoiceService implements IInvoiceService {
                     .paymentStatus(paymentStatus)
                     .dateIssued(invoice.getDateIssued())
                     .build();
-            return repository.save(updated);
+            return repository.update(updated);
         }
         return null;
     }

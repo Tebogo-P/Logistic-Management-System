@@ -1,7 +1,5 @@
 package za.ac.cput.logisticmanagementsystem.factory;
-
 import za.ac.cput.logisticmanagementsystem.domain.Invoice;
-
 import java.util.Date;
 import java.util.UUID;
 
