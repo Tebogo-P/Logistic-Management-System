@@ -1,11 +1,10 @@
-package za.ac.cput.logisticmanagementsystem.factory;
+package za.ac.cput.logisticmanagementsystem.controller;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import za.ac.cput.logisticmanagementsystem.controller.ShipmentController;
 import za.ac.cput.logisticmanagementsystem.domain.Shipment;
 import za.ac.cput.logisticmanagementsystem.service.impl.ShipmentService;
 
