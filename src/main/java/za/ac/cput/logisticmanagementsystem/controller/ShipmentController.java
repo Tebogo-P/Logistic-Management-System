@@ -1,7 +1,5 @@
 package za.ac.cput.logisticmanagementsystem.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import za.ac.cput.logisticmanagementsystem.domain.Shipment;
 import za.ac.cput.logisticmanagementsystem.service.impl.ShipmentService;
@@ -11,12 +9,12 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/shipments")
 @CrossOrigin(origins = "http://localhost:3000")
-public class ShipmemtController {
+public class ShipmentController {
 
 
     private ShipmentService service;
 
-    public ShipmemtController(ShipmentService service) {
+    public ShipmentController(ShipmentService service) {
         this.service = service;
     }
 
