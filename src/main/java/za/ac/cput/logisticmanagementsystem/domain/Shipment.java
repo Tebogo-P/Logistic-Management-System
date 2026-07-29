@@ -1,5 +1,5 @@
 package za.ac.cput.logisticmanagementsystem.domain;
-
+import jakarta.persistence.*;
 import java.time.LocalDate;
 
 /**
@@ -7,16 +7,38 @@ import java.time.LocalDate;
  * Author: Inam Ngqokomashe
  * 222660155
  */
+@Entity
+@Table(name = "shipment")
+
 public class Shipment {
+    @Id
     private String shipmentId;
+
+    @Column(nullable = false)
     private double weight;
+
+    @Column(nullable = false)
     private String origin;
+
+    @Column(nullable = false)
     private String destination;
+
+    @Column(nullable = false)
     private LocalDate dispatchDate;
+
+    @Column(nullable = false)
     private LocalDate estimatedDeliveryDate;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "contract_Id")
     private ShippingContract shippingContract;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "inventory_Id")
     private Inventory inventory;
 
+    protected Shipment(){
+    }
 
 
     public Shipment(Builder builder) {
