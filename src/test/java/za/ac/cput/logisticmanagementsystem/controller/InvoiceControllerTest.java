@@ -12,6 +12,7 @@ import za.ac.cput.logisticmanagementsystem.domain.Invoice;
 import za.ac.cput.logisticmanagementsystem.factory.InvoiceFactory;
 
 import java.util.Date;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -29,12 +30,11 @@ class InvoiceControllerTest {
     void create() {
         invoice = InvoiceFactory.buildInvoice(2500.50, "Pending", new Date());
 
-        ResponseEntity<Invoice> response = controller.create(invoice);
+        Invoice response = controller.create(invoice);
 
         assertNotNull(response);
-        assertEquals(HttpStatus.OK, response.getStatusCode());
 
-        Invoice savedInvoice = response.getBody();
+        Invoice savedInvoice = response;
         assertNotNull(savedInvoice);
         assertEquals(invoice.getInvoiceId(), savedInvoice.getInvoiceId());
         System.out.println("Saved data: " + savedInvoice);
@@ -61,11 +61,11 @@ class InvoiceControllerTest {
                 .dateIssued(invoice.getDateIssued())
                 .build();
 
-        ResponseEntity<Invoice> response = controller.update(updated);
+        Invoice response = controller.update(updated);
 
-        assertNotNull(response.getBody());
-        assertEquals("Paid", response.getBody().getPaymentStatus());
-        System.out.println("Updated: " + response.getBody());
+        assertNotNull(response);
+        assertEquals("Paid", response.getPaymentStatus());
+        System.out.println("Updated: " + response);
     }
 
     @Test
@@ -78,9 +78,9 @@ class InvoiceControllerTest {
     @Test
     @Order(5)
     void getAll() {
-        ResponseEntity<?> response = controller.getAll();
+        List<Invoice> response = controller.getAll();
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response);
         System.out.println("Get All successful.");
     }
 }
