@@ -1,9 +1,13 @@
 package za.ac.cput.logisticmanagementsystem.domain;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import java.time.LocalDate;
 
+@Entity
 public class ShippingContract {
 
+    @Id
     private String contractId;
     private String contractNumber;
     private Double pricePerKg;

@@ -14,7 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import za.ac.cput.logisticmanagementsystem.domain.ShipmentTracking;
-import za.ac.cput.logisticmanagementsystem.service.ShipmentTrackingService;
+import za.ac.cput.logisticmanagementsystem.service.impl.ShipmentTrackingService;
 
 import java.util.List;
 

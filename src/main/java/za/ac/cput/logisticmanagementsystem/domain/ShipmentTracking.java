@@ -2,11 +2,17 @@ package za.ac.cput.logisticmanagementsystem.domain;
 
 
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.JoinColumn;
 import java.time.LocalDate;
 import java.util.Objects;
 
+@Entity
 public class ShipmentTracking {
 
+    @Id
     private String trackingId;
     private String trackingNumber;
     private String currentLocation;
@@ -14,6 +20,8 @@ public class ShipmentTracking {
     private LocalDate dateCreated;
 
     // Relationship
+    @OneToOne
+    @JoinColumn(name = "shipment_id")
     private Shipment shipment;
 
     // Private constructor

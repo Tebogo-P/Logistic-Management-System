@@ -1,6 +1,8 @@
 package za.ac.cput.logisticmanagementsystem.repository;
 
 import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import za.ac.cput.logisticmanagementsystem.domain.Invoice;
 import za.ac.cput.logisticmanagementsystem.factory.InvoiceFactory;
 import java.util.Date;
@@ -13,15 +15,17 @@ import static org.junit.jupiter.api.Assertions.*;
  * Date: 27 July 2026
  */
 
+@SpringBootTest
 @TestMethodOrder(MethodOrderer.MethodName.class)
 class InvoiceRepositoryTest {
 
-    private static final IInvoiceRepository repository = InvoiceRepository.getRepository();
+    @Autowired
+    private IInvoiceRepository repository;
     private static Invoice invoice = InvoiceFactory.buildInvoice(1000.0, "Pending", new Date());
 
     @Test
     void createInvoice() {
-        Invoice created = repository.create(invoice);
+        Invoice created = repository.save(invoice);
         assertNotNull(created);
         assertEquals(invoice.getInvoiceId(), created.getInvoiceId());
         System.out.println("Created: " + created);
@@ -29,7 +33,7 @@ class InvoiceRepositoryTest {
 
     @Test
     void readInvoice() {
-        Invoice read = repository.read(invoice.getInvoiceId());
+        Invoice read = repository.findById(invoice.getInvoiceId()).orElse(null);
         assertNotNull(read);
         assertEquals(invoice.getTotal(), read.getTotal());
         System.out.println("Read: " + read);
@@ -44,7 +48,7 @@ class InvoiceRepositoryTest {
                 .dateIssued(invoice.getDateIssued())
                 .build();
 
-        Invoice updated = repository.update(updatedInvoice);
+        Invoice updated = repository.save(updatedInvoice);
         assertNotNull(updated);
         assertEquals("Paid", updated.getPaymentStatus());
         assertEquals(2000.0, updated.getTotal());
@@ -54,14 +58,15 @@ class InvoiceRepositoryTest {
 
     @Test
     void getAllInvoice() {
-        assertFalse(repository.getAll().isEmpty());
-        System.out.println("All invoices: " + repository.getAll());
+        assertFalse(repository.findAll().isEmpty());
+        System.out.println("All invoices: " + repository.findAll());
     }
 
     @Test
     void deleteInvoice() {
-        boolean deleted = repository.delete(invoice.getInvoiceId());
-        assertTrue(deleted);
+        repository.deleteById(invoice.getInvoiceId());
+        assertFalse(repository.existsById(invoice.getInvoiceId()));
         System.out.println("Deleted Successfully: " + invoice.getInvoiceId());
     }
 }
+
