@@ -16,6 +16,25 @@ const Invoices = () => {
         />
         <button className="filter-btn">Filter</button>
       </div>
+
+      <div className="invoices-list-container">
+        <table className="invoices-table">
+          <thead>
+            <tr>
+              <th>Invoice ID</th>
+              <th>Date</th>
+              <th>Amount</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td colSpan="5" className="empty-state">No invoices found.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };
