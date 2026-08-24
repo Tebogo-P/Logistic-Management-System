@@ -1,7 +1,7 @@
 /* 24/08/2026
  *Companies.jsx
  *Companies in pages folder
- *Maghdie Petersen 230600204
+ * Maghdie Petersen 230600204
  *  */
 
 import React, {useState, useEffect} from 'react';
