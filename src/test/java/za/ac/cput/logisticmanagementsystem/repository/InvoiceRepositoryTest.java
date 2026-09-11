@@ -16,7 +16,15 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 
 @SpringBootTest
+<<<<<<< HEAD
+<<<<<<< HEAD
 @TestMethodOrder(MethodOrderer.MethodName.class)
+=======
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+>>>>>>> cfe486b (Initial commit with setup fixes (Tailwind config, Java 17))
+=======
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+>>>>>>> cfe486b (Initial commit with setup fixes (Tailwind config, Java 17))
 class InvoiceRepositoryTest {
 
     @Autowired
@@ -24,6 +32,14 @@ class InvoiceRepositoryTest {
     private static Invoice invoice = InvoiceFactory.buildInvoice(1000.0, "Pending", new Date());
 
     @Test
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+    @Order(1)
+>>>>>>> cfe486b (Initial commit with setup fixes (Tailwind config, Java 17))
+=======
+    @Order(1)
+>>>>>>> cfe486b (Initial commit with setup fixes (Tailwind config, Java 17))
     void createInvoice() {
         Invoice created = repository.save(invoice);
         assertNotNull(created);
@@ -32,6 +48,14 @@ class InvoiceRepositoryTest {
     }
 
     @Test
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+    @Order(2)
+>>>>>>> cfe486b (Initial commit with setup fixes (Tailwind config, Java 17))
+=======
+    @Order(2)
+>>>>>>> cfe486b (Initial commit with setup fixes (Tailwind config, Java 17))
     void readInvoice() {
         Invoice read = repository.findById(invoice.getInvoiceId()).orElse(null);
         assertNotNull(read);
@@ -40,6 +64,14 @@ class InvoiceRepositoryTest {
     }
 
     @Test
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+    @Order(3)
+>>>>>>> cfe486b (Initial commit with setup fixes (Tailwind config, Java 17))
+=======
+    @Order(3)
+>>>>>>> cfe486b (Initial commit with setup fixes (Tailwind config, Java 17))
     void updateInvoice() {
         Invoice updatedInvoice = new Invoice.Builder()
                 .invoiceId(invoice.getInvoiceId()) // Use existing ID
@@ -57,12 +89,28 @@ class InvoiceRepositoryTest {
     }
 
     @Test
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+    @Order(4)
+>>>>>>> cfe486b (Initial commit with setup fixes (Tailwind config, Java 17))
+=======
+    @Order(4)
+>>>>>>> cfe486b (Initial commit with setup fixes (Tailwind config, Java 17))
     void getAllInvoice() {
         assertFalse(repository.findAll().isEmpty());
         System.out.println("All invoices: " + repository.findAll());
     }
 
     @Test
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+    @Order(5)
+>>>>>>> cfe486b (Initial commit with setup fixes (Tailwind config, Java 17))
+=======
+    @Order(5)
+>>>>>>> cfe486b (Initial commit with setup fixes (Tailwind config, Java 17))
     void deleteInvoice() {
         repository.deleteById(invoice.getInvoiceId());
         assertFalse(repository.existsById(invoice.getInvoiceId()));

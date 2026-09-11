@@ -4,6 +4,14 @@
  *Maghdie Petersen 230600204
  *  */
 @import "tailwindcss";
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+@config "../tailwind.config.js";
+>>>>>>> cfe486b (Initial commit with setup fixes (Tailwind config, Java 17))
+=======
+@config "../tailwind.config.js";
+>>>>>>> cfe486b (Initial commit with setup fixes (Tailwind config, Java 17))
 
 @layer base {
   body{

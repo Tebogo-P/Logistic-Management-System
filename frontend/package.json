@@ -9,8 +9,18 @@
     "preview": "vite preview"
   },
   "dependencies": {
+<<<<<<< HEAD
+<<<<<<< HEAD
     "axios": "^1.19.0",
     "lucide-react": "^1.34.0",
+=======
+    "axios": "^1.20.0",
+    "lucide-react": "^1.44.0",
+>>>>>>> cfe486b (Initial commit with setup fixes (Tailwind config, Java 17))
+=======
+    "axios": "^1.20.0",
+    "lucide-react": "^1.44.0",
+>>>>>>> cfe486b (Initial commit with setup fixes (Tailwind config, Java 17))
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },

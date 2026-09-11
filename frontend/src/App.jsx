@@ -28,7 +28,15 @@ function App() {
     };
 
   return (
+<<<<<<< HEAD
+<<<<<<< HEAD
     <LmsLayout activeTab={activeTab} setActiveTab={setActiveTab()}>
+=======
+    <LmsLayout activeTab={activeTab} setActiveTab={setActiveTab}>
+>>>>>>> cfe486b (Initial commit with setup fixes (Tailwind config, Java 17))
+=======
+    <LmsLayout activeTab={activeTab} setActiveTab={setActiveTab}>
+>>>>>>> cfe486b (Initial commit with setup fixes (Tailwind config, Java 17))
         {renderContent()}
     </LmsLayout>
   );
