@@ -1,131 +1,131 @@
 package za.ac.cput.logisticmanagementsystem.service;
 
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import static org.junit.jupiter.api.Assertions.*;
+
 import za.ac.cput.logisticmanagementsystem.domain.Invoice;
 import za.ac.cput.logisticmanagementsystem.factory.InvoiceFactory;
-import za.ac.cput.logisticmanagementsystem.repository.IInvoiceRepository;
+import za.ac.cput.logisticmanagementsystem.repository.InvoiceRepository;
+
 import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * InvoiceServiceTest.java
- * Service implementation for Invoice business logic tests
+ * Test class for InvoiceService
  * Author: Tebogo Pii 230226442
- * Date: 29 July 2026
+ * Date: 27-28 July 2026
  */
 
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class InvoiceServiceTest {
 
-    @Mock
-    private IInvoiceRepository repository;
-
-    @InjectMocks
+    @Autowired
     private InvoiceService service;
 
-    private static final Invoice invoice = InvoiceFactory.buildInvoice(2500.50, "Pending", new Date());
+    @Autowired
+    private InvoiceRepository repository;
+
+    private static String invoiceId;
+    private static final Date dateIssued = new Date();
+
+    @BeforeEach
+    void setUp() {
+        repository.deleteAll();
+    }
 
     @Test
     @Order(1)
-    void create() {
-        Mockito.when(repository.save(invoice)).thenReturn(invoice);
+    void a_testCreate() {
+        Invoice invoice = InvoiceFactory.buildInvoice(2500.50, "Pending", dateIssued);
         Invoice created = service.create(invoice);
         assertNotNull(created);
-        assertEquals(invoice.getInvoiceId(), created.getInvoiceId());
+        invoiceId = created.getInvoiceId();
         System.out.println("Created: " + created);
     }
 
     @Test
     @Order(2)
-    void read() {
-        Mockito.when(repository.findById(invoice.getInvoiceId())).thenReturn(Optional.of(invoice));
-        Invoice read = service.read(invoice.getInvoiceId());
+    void b_testRead() {
+        Invoice invoice = InvoiceFactory.buildInvoice(1500.00, "Paid", dateIssued);
+        Invoice created = service.create(invoice);
+        Invoice read = service.read(created.getInvoiceId());
         assertNotNull(read);
-        assertEquals(2500.50, read.getTotal());
-        System.out.println("Read: " + read);
+        assertEquals(1500.00, read.getTotal());
     }
 
     @Test
     @Order(3)
-    void update() {
-        Invoice updatedInvoice = new Invoice.Builder()
-                .invoiceId(invoice.getInvoiceId())
-                .total(3000.00)
+    void c_testUpdate() {
+        Invoice invoice = InvoiceFactory.buildInvoice(1000.00, "Pending", dateIssued);
+        Invoice created = service.create(invoice);
+        
+        Invoice updated = new Invoice.Builder()
+                .invoiceId(created.getInvoiceId())
+                .total(2000.00)
                 .paymentStatus("Paid")
-                .dateIssued(invoice.getDateIssued())
+                .dateIssued(dateIssued)
                 .build();
-        Mockito.when(repository.save(Mockito.any(Invoice.class))).thenReturn(updatedInvoice);
-        Invoice updated = service.update(updatedInvoice);
-        assertNotNull(updated);
-        assertEquals(3000.00, updated.getTotal());
-        System.out.println("Updated: " + updated);
+        
+        Invoice result = service.update(updated);
+        assertNotNull(result);
+        assertEquals(2000.00, result.getTotal());
     }
 
     @Test
     @Order(4)
-    void updatePaymentStatus() {
-        Invoice updatedInvoice = new Invoice.Builder()
-                .invoiceId(invoice.getInvoiceId())
-                .total(invoice.getTotal())
-                .paymentStatus("Overdue")
-                .dateIssued(invoice.getDateIssued())
-                .build();
-        Mockito.when(repository.findById(invoice.getInvoiceId())).thenReturn(Optional.of(invoice));
-        Mockito.when(repository.save(Mockito.any(Invoice.class))).thenReturn(updatedInvoice);
-        
-        Invoice updated = service.updatePaymentStatus(invoice.getInvoiceId(), "Overdue");
+    void d_testUpdatePaymentStatus() {
+        Invoice invoice = InvoiceFactory.buildInvoice(1800.00, "Pending", dateIssued);
+        Invoice created = service.create(invoice);
+        Invoice updated = service.updatePaymentStatus(created.getInvoiceId(), "Overdue");
         assertNotNull(updated);
         assertEquals("Overdue", updated.getPaymentStatus());
-        System.out.println("Updated Payment Status: " + updated);
     }
 
     @Test
     @Order(5)
-    void getAll() {
-        Mockito.when(repository.findAll()).thenReturn(List.of(invoice));
-        assertFalse(service.getAll().isEmpty());
-        System.out.println("All invoices: " + service.getAll());
+    void e_testGetAll() {
+        service.create(InvoiceFactory.buildInvoice(1000.00, "Paid", dateIssued));
+        service.create(InvoiceFactory.buildInvoice(2000.00, "Pending", dateIssued));
+        assertTrue(service.getAll().size() >= 2);
     }
 
     @Test
     @Order(6)
-    void delete() {
-        Mockito.when(repository.existsById(invoice.getInvoiceId())).thenReturn(true);
-        Mockito.doNothing().when(repository).deleteById(invoice.getInvoiceId());
-        boolean deleted = service.delete(invoice.getInvoiceId());
+    void f_testDelete() {
+        Invoice invoice = InvoiceFactory.buildInvoice(900.00, "Paid", dateIssued);
+        Invoice created = service.create(invoice);
+        boolean deleted = service.delete(created.getInvoiceId());
         assertTrue(deleted);
-        
-        Mockito.when(repository.findById(invoice.getInvoiceId())).thenReturn(Optional.empty());
-        assertNull(service.read(invoice.getInvoiceId()));
-        System.out.println("Deleted Successfully: " + invoice.getInvoiceId());
+        assertNull(service.read(created.getInvoiceId()));
     }
 
     @Test
-    void testCreateWithNullInvoice() {
-        Invoice created = service.create(null);
-        assertNull(created);
+    void testCreateWithNull() {
+        assertNull(service.create(null));
+    }
+
+    @Test
+    void testReadNonExistent() {
+        assertNull(service.read("invalid-id"));
+    }
+
+    @Test
+    void testUpdateWithNull() {
+        assertNull(service.update(null));
     }
 
     @Test
     void testUpdatePaymentStatusWithInvalidInput() {
-        Invoice testInvoice = InvoiceFactory.buildInvoice(1200.00, "Pending", new Date());
+        Invoice invoice = InvoiceFactory.buildInvoice(1200.00, "Pending", dateIssued);
+        Invoice created = service.create(invoice);
         
-        Mockito.when(repository.findById("invalid-id")).thenReturn(Optional.empty());
         assertNull(service.updatePaymentStatus("invalid-id", "Paid"));
-        
-        Mockito.when(repository.findById(testInvoice.getInvoiceId())).thenReturn(Optional.of(testInvoice));
-        assertNull(service.updatePaymentStatus(testInvoice.getInvoiceId(), null));
-        assertNull(service.updatePaymentStatus(testInvoice.getInvoiceId(), ""));
+        assertNull(service.updatePaymentStatus(created.getInvoiceId(), null));
+        assertNull(service.updatePaymentStatus(created.getInvoiceId(), ""));
     }
 }
+
+

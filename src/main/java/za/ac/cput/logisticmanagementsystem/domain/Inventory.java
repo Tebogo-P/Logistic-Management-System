@@ -6,13 +6,8 @@
 
 package za.ac.cput.logisticmanagementsystem.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-
-@Entity
 public class Inventory {
 
-    @Id
     private String inventoryId;
     private String itemName;
     private String sku;

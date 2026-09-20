@@ -1,11 +1,11 @@
 package za.ac.cput.logisticmanagementsystem.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import za.ac.cput.logisticmanagementsystem.domain.Invoice;
-import za.ac.cput.logisticmanagementsystem.repository.IInvoiceRepository;
+import za.ac.cput.logisticmanagementsystem.repository.InvoiceRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * InvoiceService.java
@@ -17,10 +17,9 @@ import java.util.List;
 @Service
 public class InvoiceService implements IInvoiceService {
 
-    private final IInvoiceRepository repository;
+    private final InvoiceRepository repository;
 
-    @Autowired
-    public InvoiceService(IInvoiceRepository repository) {
+    public InvoiceService(InvoiceRepository repository) {
         this.repository = repository;
     }
 
@@ -34,7 +33,8 @@ public class InvoiceService implements IInvoiceService {
 
     @Override
     public Invoice read(String invoiceId) {
-        return repository.findById(invoiceId).orElse(null);
+        Optional<Invoice> invoice = repository.findById(invoiceId);
+        return invoice.orElse(null);
     }
 
     @Override
@@ -47,11 +47,12 @@ public class InvoiceService implements IInvoiceService {
 
     @Override
     public boolean delete(String invoiceId) {
-        if (repository.existsById(invoiceId)) {
+        try {
             repository.deleteById(invoiceId);
             return true;
+        } catch (Exception e) {
+            return false;
         }
-        return false;
     }
 
     @Override
