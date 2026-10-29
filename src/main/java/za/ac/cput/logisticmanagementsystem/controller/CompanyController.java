@@ -21,7 +21,7 @@ import java.util.Set;
 
 @RequestMapping("/api/companies")
 
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:5173"})
 
 public class CompanyController {
 
@@ -29,7 +29,11 @@ public class CompanyController {
     private CompanyService companyService;
 
     @PostMapping("/create")
-    public ResponseEntity<CompanyDomain> create(@RequestBody CompanyDomain companyDomain) {
+    public ResponseEntity<CompanyDomain> create(@RequestBody CompanyRequest request) {
+        if (request == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        CompanyDomain companyDomain = request.toDomain();
         CompanyDomain created = companyService.create(companyDomain);
         if (created == null){
             return ResponseEntity.badRequest().build();
@@ -46,21 +50,29 @@ public class CompanyController {
         return ResponseEntity.ok(companyDomain);
     }
 
-
     @PutMapping("/update")
-    public ResponseEntity<CompanyDomain> update(@RequestBody CompanyDomain companyDomain) {
+    public ResponseEntity<CompanyDomain> update(@RequestBody CompanyRequest request) {
+        if (request == null || request.companyId() == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        CompanyDomain companyDomain = request.toDomain();
         CompanyDomain updated = companyService.update(companyDomain);
         if (updated == null){
-            return ResponseEntity.badRequest().build();
+            return companyService.read(request.companyId()) == null
+                    ? ResponseEntity.notFound().build()
+                    : ResponseEntity.badRequest().build();
         }
         return ResponseEntity.ok(updated);
     }
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> delete(@PathVariable String id) {
+        if (companyService.read(id) == null) {
+            return ResponseEntity.notFound().build();
+        }
         boolean deleted = companyService.delete(id);
         if (!deleted){
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
         return ResponseEntity.noContent().build();
     }
@@ -72,7 +84,7 @@ public class CompanyController {
 
     @PatchMapping("/activate/{id}")
     public ResponseEntity<CompanyDomain> activate(@PathVariable String id) {
-        CompanyDomain activated = companyService.deactivateCompanyDomain(id);
+        CompanyDomain activated = companyService.activateCompanyDomain(id);
         if (activated == null) return ResponseEntity.notFound().build();
         return ResponseEntity.ok(activated);
     }
@@ -82,5 +94,25 @@ public class CompanyController {
         CompanyDomain deactivated = companyService.deactivateCompanyDomain(id);
         if (deactivated == null) return ResponseEntity.notFound().build();
         return ResponseEntity.ok(deactivated);
+    }
+
+    public record CompanyRequest(
+            String companyId,
+            String companyName,
+            String taxId,
+            String phoneNumber,
+            String emailAddress,
+            boolean active
+    ) {
+        private CompanyDomain toDomain() {
+            return new CompanyDomain.Builder()
+                    .setCompanyId(companyId)
+                    .setCompanyName(companyName)
+                    .setTaxId(taxId)
+                    .setPhoneNumber(phoneNumber)
+                    .setEmailAddress(emailAddress)
+                    .setIsActive(active)
+                    .build();
+        }
     }
 }
