@@ -1,4 +1,6 @@
+
 import React, { useEffect, useState } from 'react';
+
 import {
   getShipmentTracking,
   createShipmentTracking,
@@ -6,17 +8,19 @@ import {
   deleteShipmentTracking
 } from '../services/ShipmentTrackingService';
 
+import ShipmentTimeline from '../components/ShipmentTimeline';
 import './ShipmentTracking.css';
 
 function ShipmentTracking({ canEdit = true }) {
 
   const [trackingRecords, setTrackingRecords] = useState([]);
+  const [selectedTracking, setSelectedTracking] = useState(null);
 
   const [formData, setFormData] = useState({
     trackingId: '',
     trackingNumber: '',
     currentLocation: '',
-    shipmentStatus: 'In Transit',
+    shipmentStatus: 'Dispatched',
     dateCreated: new Date().toISOString().slice(0, 10)
   });
 
@@ -30,6 +34,16 @@ function ShipmentTracking({ canEdit = true }) {
     try {
       const data = await getShipmentTracking();
       setTrackingRecords(data);
+
+      // Keep the selected timeline updated after refreshing records
+      setSelectedTracking(currentSelected => {
+        if (!currentSelected) return null;
+
+        return data.find(
+            record => record.trackingId === currentSelected.trackingId
+        ) || null;
+      });
+
     } catch (error) {
       console.error(
           'Failed to load shipment tracking records from the backend',
@@ -51,7 +65,6 @@ function ShipmentTracking({ canEdit = true }) {
     event.preventDefault();
 
     try {
-
       const trackingData = {
         trackingId: formData.trackingId,
         trackingNumber: formData.trackingNumber,
@@ -66,11 +79,11 @@ function ShipmentTracking({ canEdit = true }) {
         trackingId: '',
         trackingNumber: '',
         currentLocation: '',
-        shipmentStatus: 'In Transit',
+        shipmentStatus: 'Dispatched',
         dateCreated: new Date().toISOString().slice(0, 10)
       });
 
-      loadTrackingRecords();
+      await loadTrackingRecords();
 
     } catch (error) {
       console.error(
@@ -83,7 +96,13 @@ function ShipmentTracking({ canEdit = true }) {
   async function handleDelete(trackingId) {
     try {
       await deleteShipmentTracking(trackingId);
-      loadTrackingRecords();
+
+      if (selectedTracking?.trackingId === trackingId) {
+        setSelectedTracking(null);
+      }
+
+      await loadTrackingRecords();
+
     } catch (error) {
       console.error(
           'Failed to delete shipment tracking record',
@@ -105,102 +124,117 @@ function ShipmentTracking({ canEdit = true }) {
 
         <header className="page-header">
           <h1>Shipment Tracking</h1>
-          <p>Monitor and track shipments across the logistics system.</p>
+          <p>
+            Monitor and track shipments across the logistics system.
+          </p>
         </header>
 
+        {/* Selected Shipment Timeline */}
+
+        {selectedTracking && (
+            <div>
+              <ShipmentTimeline tracking={selectedTracking} />
+
+              <button
+                  type="button"
+                  className="close-timeline-btn"
+                  onClick={() => setSelectedTracking(null)}
+              >
+                Close Timeline
+              </button>
+            </div>
+        )}
 
         {/* Create Tracking Record */}
 
-        {canEdit && <section className="tracking-form-card">
+        {canEdit && (
+            <section className="tracking-form-card">
 
-          <h2>Create Tracking Record</h2>
+              <h2>Create Tracking Record</h2>
 
-          <p className="form-description">
-            Enter the shipment tracking details below.
-          </p>
+              <p className="form-description">
+                Enter the shipment tracking details below.
+              </p>
 
-          <form
-              className="tracking-form"
-              onSubmit={handleSubmit}
-          >
-
-            <label>
-              Tracking ID
-              <input
-                  name="trackingId"
-                  placeholder="TRK-001"
-                  value={formData.trackingId}
-                  onChange={handleInputChange}
-                  required
-              />
-            </label>
-
-
-            <label>
-              Tracking Number
-              <input
-                  name="trackingNumber"
-                  placeholder="TRACK-001"
-                  value={formData.trackingNumber}
-                  onChange={handleInputChange}
-                  required
-              />
-            </label>
-
-
-            <label>
-              Current Location
-              <input
-                  name="currentLocation"
-                  placeholder="Cape Town"
-                  value={formData.currentLocation}
-                  onChange={handleInputChange}
-                  required
-              />
-            </label>
-
-
-            <label>
-              Shipment Status
-              <select
-                  name="shipmentStatus"
-                  value={formData.shipmentStatus}
-                  onChange={handleInputChange}
+              <form
+                  className="tracking-form"
+                  onSubmit={handleSubmit}
               >
-                <option value="Pending">Pending</option>
-                <option value="In Transit">In Transit</option>
-                <option value="Out for Delivery">
-                  Out for Delivery
-                </option>
-                <option value="Delivered">Delivered</option>
-                <option value="Delayed">Delayed</option>
-              </select>
-            </label>
 
+                <label>
+                  Tracking ID
+                  <input
+                      name="trackingId"
+                      placeholder="TRK-001"
+                      value={formData.trackingId}
+                      onChange={handleInputChange}
+                      required
+                  />
+                </label>
 
-            <label>
-              Date Created
-              <input
-                  name="dateCreated"
-                  type="date"
-                  value={formData.dateCreated}
-                  onChange={handleInputChange}
-                  required
-              />
-            </label>
+                <label>
+                  Tracking Number
+                  <input
+                      name="trackingNumber"
+                      placeholder="TRACK-001"
+                      value={formData.trackingNumber}
+                      onChange={handleInputChange}
+                      required
+                  />
+                </label>
 
+                <label>
+                  Current Location
+                  <input
+                      name="currentLocation"
+                      placeholder="Cape Town"
+                      value={formData.currentLocation}
+                      onChange={handleInputChange}
+                      required
+                  />
+                </label>
 
-            <button
-                type="submit"
-                className="save-tracking-btn"
-            >
-              Create Tracking
-            </button>
+                <label>
+                  Shipment Status
+                  <select
+                      name="shipmentStatus"
+                      value={formData.shipmentStatus}
+                      onChange={handleInputChange}
+                  >
+                    <option value="Pending">Pending</option>
+                    <option value="Dispatched">Dispatched</option>
+                    <option value="In Transit">In Transit</option>
+                    <option value="Customs">Customs</option>
+                    <option value="Out for Delivery">
+                      Out for Delivery
+                    </option>
+                    <option value="Delivered">Delivered</option>
+                    <option value="Delayed">Delayed</option>
+                  </select>
+                </label>
 
-          </form>
+                <label>
+                  Date Created
+                  <input
+                      name="dateCreated"
+                      type="date"
+                      value={formData.dateCreated}
+                      onChange={handleInputChange}
+                      required
+                  />
+                </label>
 
-        </section>}
+                <button
+                    type="submit"
+                    className="save-tracking-btn"
+                >
+                  Create Tracking
+                </button>
 
+              </form>
+
+            </section>
+        )}
 
         {/* Tracking Records */}
 
@@ -229,13 +263,11 @@ function ShipmentTracking({ canEdit = true }) {
 
           </div>
 
-
           <div className="tracking-table-wrapper">
 
             <table className="tracking-table">
 
               <thead>
-
               <tr>
                 <th>Tracking ID</th>
                 <th>Tracking Number</th>
@@ -244,9 +276,7 @@ function ShipmentTracking({ canEdit = true }) {
                 <th>Date Created</th>
                 <th>Actions</th>
               </tr>
-
               </thead>
-
 
               <tbody>
 
@@ -280,7 +310,6 @@ function ShipmentTracking({ canEdit = true }) {
                         </td>
 
                         <td>
-
                                             <span
                                                 className={`status-badge status-${record.shipmentStatus
                                                     ?.toLowerCase()
@@ -288,7 +317,6 @@ function ShipmentTracking({ canEdit = true }) {
                                             >
                                                 {record.shipmentStatus}
                                             </span>
-
                         </td>
 
                         <td>
@@ -301,16 +329,29 @@ function ShipmentTracking({ canEdit = true }) {
 
                         <td>
 
-                          {canEdit && <button
-                              className="delete-tracking-btn"
+                          <button
+                              type="button"
+                              className="view-timeline-btn"
                               onClick={() =>
-                                  handleDelete(
-                                      record.trackingId
-                                  )
+                                  setSelectedTracking(record)
                               }
                           >
-                            Delete
-                          </button>}
+                            View Timeline
+                          </button>
+
+                          {canEdit && (
+                              <button
+                                  type="button"
+                                  className="delete-tracking-btn"
+                                  onClick={() =>
+                                      handleDelete(
+                                          record.trackingId
+                                      )
+                                  }
+                              >
+                                Delete
+                              </button>
+                          )}
 
                         </td>
 

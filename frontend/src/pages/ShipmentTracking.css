@@ -22,7 +22,7 @@
 }
 
 
-/* Create Tracking Card */
+
 
 .tracking-form-card {
     background-color: #ffffff;
@@ -46,7 +46,7 @@
 }
 
 
-/* Form */
+
 
 .tracking-form {
     display: grid;
@@ -85,7 +85,7 @@
 }
 
 
-/* Create Button */
+
 
 .save-tracking-btn {
     min-height: 42px;
@@ -104,7 +104,7 @@
 }
 
 
-/* Tracking Records */
+
 
 .tracking-list-container {
     background-color: #ffffff;
@@ -135,7 +135,7 @@
 }
 
 
-/* Search */
+
 
 .tracking-search-input {
     width: min(100%, 280px);
@@ -153,7 +153,7 @@
 }
 
 
-/* Table */
+
 
 .tracking-table-wrapper {
     overflow-x: auto;
@@ -188,7 +188,7 @@
 }
 
 
-/* Status */
+
 
 .status-badge {
     display: inline-block;
@@ -199,7 +199,7 @@
 }
 
 
-/* Default status */
+
 
 .status-badge {
     background-color: #e2e8f0;
@@ -207,7 +207,7 @@
 }
 
 
-/* Actions */
+
 
 .delete-tracking-btn {
     border: none;
@@ -223,7 +223,7 @@
 }
 
 
-/* Empty table */
+
 
 .empty-state {
     text-align: center;
@@ -234,7 +234,6 @@
 }
 
 
-/* Mobile */
 
 @media (max-width: 900px) {
 
@@ -262,4 +261,35 @@
     .tracking-form {
         grid-template-columns: 1fr;
     }
+}
+
+
+.view-timeline-btn {
+    background: #2563eb;
+    color: #ffffff;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    margin-right: 8px;
+}
+
+.view-timeline-btn:hover {
+    background: #1d4ed8;
+}
+
+.close-timeline-btn {
+    background: #64748b;
+    color: #ffffff;
+    border: none;
+    padding: 9px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin: 0 0 20px;
+}
+
+.close-timeline-btn:hover {
+    background: #475569;
 }
