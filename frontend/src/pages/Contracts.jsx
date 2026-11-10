@@ -1,9 +1,10 @@
 import React, {useState, useEffect} from 'react';
 import {getAllContracts, createContract, updateContract, deleteContract} from '../services/ContractService.js';
-import {getContractStatus} from '../services/ContractAnalytics.js';
+import {getContractStatus, getContractAnalytics} from '../services/ContractAnalytics.js';
+import {getAllCompanies} from '../services/CompanyService.js';
 import {Plus, Trash2, Edit3} from 'lucide-react';
 
-const emptyForm = {contractNumber: '', pricePerKg: '', contractStartDate: '', contractExpiryDate: ''};
+const emptyForm = {contractNumber: '', companyId: '', pricePerKg: '', contractStartDate: '', contractExpiryDate: ''};
 
 // Colour of the status badge for each status.
 const badgeStyle = {
@@ -14,17 +15,29 @@ const badgeStyle = {
 
 const Contracts = ({ canEdit = true }) => {
   const [contracts, setContracts] = useState([]);
+  const [companies, setCompanies] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [formData, setFormData] = useState(emptyForm);
   const [editingContract, setEditingContract] = useState(null);
   const [error, setError] = useState('');
 
-  useEffect(() => { loadContracts(); }, []);
+  useEffect(() => { loadContracts(); loadCompanies(); }, []);
 
   const loadContracts = () => {
     getAllContracts().then(res => setContracts(res.data))
         .catch(err => console.error('API Error:', err));
   };
+
+  // Companies fill the dropdown, so a contract can be linked to a company.
+  const loadCompanies = () => {
+    getAllCompanies().then(res => setCompanies(Array.isArray(res.data) ? res.data : []))
+        .catch(err => console.error('Could not load companies:', err));
+  };
+
+  // Turns a companyId into the company name shown in the table.
+  const companyName = (id) => companies.find(co => co.companyId === id)?.companyName || '-';
+
+  const analytics = getContractAnalytics(contracts);
 
   const handleInputChange = (e) => {
     const {name, value} = e.target;
@@ -46,6 +59,7 @@ const Contracts = ({ canEdit = true }) => {
     createContract({
       contractId: 'CON-' + Date.now(),
       contractNumber: formData.contractNumber,
+      companyId: formData.companyId || null,
       pricePerKg: Number(formData.pricePerKg),
       contractStartDate: formData.contractStartDate,
       contractExpiryDate: formData.contractExpiryDate,
@@ -65,6 +79,7 @@ const Contracts = ({ canEdit = true }) => {
     updateContract({
       contractId: editingContract.contractId,
       contractNumber: editingContract.contractNumber,
+      companyId: editingContract.companyId || null,
       pricePerKg: Number(editingContract.pricePerKg),
       contractStartDate: editingContract.contractStartDate,
       contractExpiryDate: editingContract.contractExpiryDate,
@@ -87,6 +102,17 @@ const Contracts = ({ canEdit = true }) => {
 
   return (
     <div className="p-8">
+      {/* Alerts: show when contracts are about to expire or have expired */}
+      {analytics.expiringSoon > 0 && (
+        <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-700">
+          <strong>{analytics.expiringSoon}</strong> contract(s) expire within 30 days. Next to expire: {analytics.nextToExpire?.contractNumber} on {analytics.nextToExpire?.contractExpiryDate}.
+        </div>
+      )}
+      {analytics.expired > 0 && (
+        <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-lms-danger">
+          <strong>{analytics.expired}</strong> contract(s) have expired.
+        </div>
+      )}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Form */}
         {canEdit && <div className="bg-white p-6 rounded-lg border border-slate-200 shadow-sm h-fit">
@@ -95,6 +121,10 @@ const Contracts = ({ canEdit = true }) => {
           </h2>
           <form onSubmit={handleCreateSubmit} className="space-y-4">
             <input type="text" name="contractNumber" placeholder="Contract Number" value={formData.contractNumber} onChange={handleInputChange} className="w-full p-2.5 border rounded text-sm" required/>
+            <select name="companyId" value={formData.companyId} onChange={handleInputChange} className="w-full p-2.5 border rounded text-sm">
+              <option value="">Select company (optional)</option>
+              {companies.map(co => <option key={co.companyId} value={co.companyId}>{co.companyName}</option>)}
+            </select>
             <input type="number" name="pricePerKg" placeholder="Price per kg (R)" min="0.01" step="0.01" value={formData.pricePerKg} onChange={handleInputChange} className="w-full p-2.5 border rounded text-sm" required/>
             <label className="block text-xs font-semibold text-lms-textMuted">Start date
               <input type="date" name="contractStartDate" value={formData.contractStartDate} onChange={handleInputChange} className="mt-1 w-full p-2.5 border rounded text-sm font-normal" required/>
@@ -117,6 +147,7 @@ const Contracts = ({ canEdit = true }) => {
             <thead>
             <tr className="border-b bg-slate-50 text-xs font-semibold text-lms-textMuted uppercase">
               <th className="p-3">Contract No.</th>
+              <th className="p-3">Company</th>
               <th className="p-3">Price / kg</th>
               <th className="p-3">Start</th>
               <th className="p-3">Expiry</th>
@@ -130,6 +161,7 @@ const Contracts = ({ canEdit = true }) => {
               return (
                 <tr key={c.contractId} className="hover:bg-lms-ice/40">
                   <td className="p-3 font-semibold">{c.contractNumber}</td>
+                  <td className="p-3 text-lms-textMuted">{companyName(c.companyId)}</td>
                   <td className="p-3 text-lms-textMuted">R {Number(c.pricePerKg).toFixed(2)}</td>
                   <td className="p-3 text-lms-textMuted">{c.contractStartDate}</td>
                   <td className="p-3 text-lms-textMuted">{c.contractExpiryDate}</td>
@@ -158,6 +190,10 @@ const Contracts = ({ canEdit = true }) => {
             <h3 className="text-lg font-bold mb-4">Edit Contract</h3>
             <form onSubmit={handleUpdateSubmit} className="space-y-3">
               <input type="text" name="contractNumber" value={editingContract.contractNumber} onChange={handleInputChange} className="w-full p-2 border rounded text-sm" required/>
+              <select name="companyId" value={editingContract.companyId || ''} onChange={handleInputChange} className="w-full p-2 border rounded text-sm">
+                <option value="">No company</option>
+                {companies.map(co => <option key={co.companyId} value={co.companyId}>{co.companyName}</option>)}
+              </select>
               <input type="number" name="pricePerKg" min="0.01" step="0.01" value={editingContract.pricePerKg} onChange={handleInputChange} className="w-full p-2 border rounded text-sm" required/>
               <input type="date" name="contractStartDate" value={editingContract.contractStartDate} onChange={handleInputChange} className="w-full p-2 border rounded text-sm" required/>
               <input type="date" name="contractExpiryDate" value={editingContract.contractExpiryDate} onChange={handleInputChange} className="w-full p-2 border rounded text-sm" required/>

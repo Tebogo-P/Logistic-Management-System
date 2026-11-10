@@ -10,6 +10,7 @@ public class ShippingContract {
     @Id
     private String contractId;
     private String contractNumber;
+    private String companyId;   // optional link to CompanyDomain (company_id column)
     private Double pricePerKg;
     private LocalDate contractStartDate;
     private LocalDate contractExpiryDate;
@@ -20,6 +21,7 @@ public class ShippingContract {
     private ShippingContract(Builder builder) {
         this.contractId = builder.contractId;
         this.contractNumber = builder.contractNumber;
+        this.companyId = builder.companyId;
         this.pricePerKg = builder.pricePerKg;
         this.contractStartDate = builder.contractStartDate;
         this.contractExpiryDate = builder.contractExpiryDate;
@@ -33,6 +35,10 @@ public class ShippingContract {
 
     public String getContractNumber() {
         return contractNumber;
+    }
+
+    public String getCompanyId() {
+        return companyId;
     }
 
     public Double getPricePerKg() {
@@ -79,6 +85,7 @@ public class ShippingContract {
         return "ShippingContract{" +
                 "contractId='" + contractId + '\'' +
                 ", contractNumber='" + contractNumber + '\'' +
+                ", companyId='" + companyId + '\'' +
                 ", pricePerKg=" + pricePerKg +
                 ", contractStartDate=" + contractStartDate +
                 ", contractExpiryDate=" + contractExpiryDate +
@@ -89,6 +96,7 @@ public class ShippingContract {
     public static class Builder {
         private String contractId;
         private String contractNumber;
+        private String companyId;
         private Double pricePerKg;
         private LocalDate contractStartDate;
         private LocalDate contractExpiryDate;
@@ -100,6 +108,11 @@ public class ShippingContract {
 
         public Builder setContractNumber(String contractNumber) {
             this.contractNumber = contractNumber;
+            return this;
+        }
+
+        public Builder setCompanyId(String companyId) {
+            this.companyId = companyId;
             return this;
         }
 
